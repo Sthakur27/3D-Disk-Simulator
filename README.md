@@ -11,3 +11,4 @@ to enter a function:
 press Enter.   The function bar should turn red
 write function  (use @ for theta in polar, all variables must be adjacent to operators or parenthesis. ie. 3x should be 3*x)
 press Enter again to submit function. The funciton bar will turn black
+"A" to toggle the axis display
