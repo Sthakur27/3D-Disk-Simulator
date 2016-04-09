@@ -1,10 +1,10 @@
 import java.lang.Math;
 public class pObj{
-    double num=0;
+    public double num=0;
     String oper="";
     String paren="";
     String sciop="";
-    int mode=0;  //0:numbers  1: operators(+,-)  2: parenthesis   3: scientific operator(sin cos)  4: x values
+    public int mode=0;  //0:numbers  1: operators(+,-)  2: parenthesis   3: scientific operator(sin cos)  4: x values
     public pObj(int i,String str){
       mode=i;
       if(mode==0){

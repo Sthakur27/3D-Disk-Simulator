@@ -7,6 +7,9 @@ public class parse{
     static String type3="()";
     static String type4="cstl"; //cos  sin tan log
     static ArrayList<pObj> pobs=new ArrayList<>();
+    static ArrayList<pObj> temppobs=new ArrayList<>();
+    static ArrayList<Double> thetaorx=new ArrayList<>();
+    static ArrayList<Double> rory=new ArrayList<>();
     public static double interp(String str){
         if(str.equals("")){return(0);}
         exp=str;
@@ -18,6 +21,28 @@ public class parse{
         //parse.eval(0,pobs.size()-1);
         //print();
     }
+    
+    public static void polarinterp(String str, double start, double end, double step){
+        thetaorx.clear(); rory.clear();
+        if(str.equals("")){
+           thetaorx.add(0.0); rory.add(0.0);
+        }
+        else{
+            for (double i=start;i<=end;i=i+step){
+              exp=str.replaceAll("@","("+Double.toString(i)+")");
+              //exp=exp.replaceAll("x","("+Double.toString(i)+")");
+              //if(str.equals("")){return(0);}
+              //exp=str;
+              classify();
+              fulleval();
+              double temp=pobs.get(0).num;
+              pobs.clear();
+              thetaorx.add(temp*Math.cos(i));
+              rory.add(temp*Math.sin(i));
+            }  
+        }
+    }
+    //turn string into arraylist of pObj's
     public static void classify(){
         char[]temp=exp.toCharArray();
         int a=0;
@@ -43,6 +68,7 @@ public class parse{
             else{pobs.add(new pObj(4,Character.toString(exp.charAt(i))));}
         }
     }
+    
     //check if parenthesis exists
     public static boolean paren(){
         for (pObj a:pobs){
@@ -53,7 +79,8 @@ public class parse{
     //parenthesis eval
     public static void fulleval(){
         int left=0;
-        while(paren()){
+        int numofiterations=0;
+        while(paren()&&numofiterations<10){
             for (int j=0;j<pobs.size();j++){
                 if (pobs.get(j).paren.equals("(")){
                     left=j;
@@ -65,6 +92,7 @@ public class parse{
                     break;
                 }
             }
+            numofiterations++;
         }   
         //now the parenthesis are all gone
         eval(0,pobs.size()-1);
@@ -124,6 +152,7 @@ public class parse{
         for(int i=startpos;i<=endpos;i++){
             if(pobs.get(i).mode==1){
                 if(pobs.get(i).oper.equals("/")){
+                    if(pobs.get(i+1).num==0){  pobs.get(i+1).num=0.01;}
                     pobs.get(i-1).num=pobs.get(i-1).num/pobs.get(i+1).num;
                     pobs.remove(i+1); pobs.remove(i);
                     i=i-1; endpos-=2;
