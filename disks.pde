@@ -1,9 +1,9 @@
-boolean rotate=false;
 FloatList xvals=new FloatList();
 FloatList yvals=new FloatList();
-FloatList rvals=new FloatList();
-FloatList thetavals=new FloatList();
-boolean cartesian=true;
+FloatList xvals2=new FloatList();
+FloatList yvals2=new FloatList();
+//FloatList rvals=new FloatList();
+//FloatList thetavals=new FloatList();
 float rx=0; float rz=0;
 boolean line=true;
 boolean axis=true;
@@ -13,15 +13,18 @@ int timer=1;
 int timer2=1;
 float scale=1;
 float scale2=1;
-boolean typing=false;
+int typing=0;
 int mode=2;   //0:disk 1: shell 2:line
 float maxval=0;
 float ry=0;
 int funcnum=0;
 int totalP=11;
+boolean twoexps=true;
 double volume=0;
 boolean paused=false;
-String exp=("4.64-(x^2^(1/3))");
+//String exp=("4.64-(x^2^(1/3))");
+String exp="x";
+String exp2=("sin(x)");
 String tempexp="";
 void setup(){
       size(500, 450,P3D);
@@ -37,6 +40,7 @@ void draw(){
     text("Area ="+(float)volume,330,20,0);}
     else{text("Volume ="+(float)volume,330,20,0);}
     text("Exp: y=("+exp+")",10,20,0);
+    text("Exp2: y=("+exp2+")",10,40,0);
     translate(width/2,height/2,0);
     rotateY(timer2*PI/180);
     rotateY(ry);
@@ -71,7 +75,7 @@ void draw(){
     stroke(#aa03eb);
     //stroke(#eb03b8);
     
-    //Arraylistmode
+    //draw function
     for (int i=0;i<xvals.size()-1;i++){
         if(mode==2){
           drawFlat(i);          
@@ -89,21 +93,34 @@ void draw(){
 }
 
 void calculate(){
-  xvals.clear(); yvals.clear(); 
+  xvals.clear(); yvals.clear(); xvals2.clear(); yvals2.clear();
   rescale();
-  for (float i=-100;i<=100;i+=0.5){
-      xvals.append(i); yvals.append(fn(i/10));
+  if(twoexps){
+    for (float i=-100;i<=100;i+=1){
+        xvals.append(i); yvals.append(fn(i/10,true));
+    }
+    for (float i=-100;i<=100;i+=1){
+        xvals2.append(i); yvals2.append(fn(i/10,false));
+    }
+    for (int i=0;i<yvals.size();i++){
+      // if(yvals2.get(i)<yvals.get(i)){yvals2.set(i,0);yvals.set(i,0);}
+    }
   }
-  //volume=simpsons();
-  volume=abs((float)integrate(-10,10));
+  else{
+    for (float i=-100;i<=100;i+=0.5){
+        xvals.append(i); yvals.append(fn(i/10,true));
+    }
+  }
+  
+  //volume=abs((float)integrate(-10,10));
 }
 
 void rescale(){
   maxval=0;
   scale=1;
   for (float i=-100;i<=100;i+=0.5){
-         if (abs(fn(i/10))>maxval){
-            maxval=abs(fn(i/10));
+         if (abs(fn(i/10,true))>maxval){
+            maxval=abs(fn(i/10,true));
          }
       }
 
@@ -111,18 +128,30 @@ void rescale(){
   if (scale==0){scale=200; }
 }
 
-float fn(float i){
-   String tempeval=exp.replaceAll("x","("+Float.toString(i)+")");
+float fn(float i,boolean a){
+   String tempeval;
+   if(a){
+   tempeval=exp.replaceAll("x","("+Float.toString(i)+")");}
+   else{tempeval=exp2.replaceAll("x","("+Float.toString(i)+")");}
    return(-scale*(float)parse.interp(tempeval));
 }
 
 
 void drawFlat(int i){
-  line(xvals.get(i),scale2*yvals.get(i),0,xvals.get(i+1),scale2*yvals.get(i+1),0);  
+  line(xvals.get(i),scale2*yvals.get(i),0,xvals.get(i+1),scale2*yvals.get(i+1),0);
+  if(twoexps){stroke(#44eb03);line(xvals2.get(i),scale2*yvals2.get(i),0,xvals2.get(i+1),scale2*yvals2.get(i+1),0);stroke(#aa03eb);}
 }
 
 void drawCircles(int i){
    for (int j=0;j<timer;j+=5){
+         if(twoexps){
+           stroke(#44eb03);
+           if(mode==0){
+               line(xvals2.get(i),scale2*yvals2.get(i)*cos(j*PI/180),scale2*yvals2.get(i)*sin(j*PI/180),xvals2.get(i),scale2*yvals2.get(i)*cos((j+5)*PI/180),scale2*yvals2.get(i)*sin((j+5)*PI/180));}
+           else{
+              line(xvals2.get(i)*cos(j*PI/180),scale2*yvals2.get(i),xvals2.get(i)*sin(j*PI/180),xvals2.get(i)*cos((j+5)*PI/180),scale2*yvals2.get(i),xvals2.get(i)*sin((j+5)*PI/180));}
+           stroke(#aa03eb);
+         }
          if(mode==0){
          line(xvals.get(i),scale2*yvals.get(i)*cos(j*PI/180),scale2*yvals.get(i)*sin(j*PI/180),xvals.get(i),scale2*yvals.get(i)*cos((j+5)*PI/180),scale2*yvals.get(i)*sin((j+5)*PI/180));}
          else{
@@ -134,6 +163,16 @@ void drawCircles(int i){
 void drawRotations(int i,float limit){
   if(i<xvals.size()-1){;
       for (float j=0;j<timer;j+=5){
+          if(twoexps){
+            stroke(#44eb03);
+            pushMatrix();
+            if(mode==0){
+            rotateX(j*PI/180);}
+            else{rotateY(j*PI/180);}
+            line(xvals2.get(i),scale2*yvals2.get(i),0,xvals2.get(i+1),scale2*yvals2.get(i+1),0);  
+            popMatrix();    
+            stroke(#aa03eb);
+          }
           pushMatrix();
           if(mode==0){
           rotateX(j*PI/180);}
@@ -148,7 +187,7 @@ void rotate(){
   rotateX(rx);
   rotateZ(rz);
 }
-
+/*
 double integrate(double a, double b) {
       if (mode==2){
           int N = 10000;                    // precision parameter
@@ -205,7 +244,7 @@ double integrate(double a, double b) {
           return sum * h * PI;      
       }     
       return(0.0);
-}
+}*/
 
 
 void keyPressed(){
@@ -215,20 +254,24 @@ void keyPressed(){
      rchoose=3;}
    }
    
-   if((key=='a'||key=='A')&& !typing){   if(axis){axis=false;} else{axis=true;}   }
-   if(key=='d' && !typing){
+   if((key=='a'||key=='A')&& typing==0){   if(axis){axis=false;} else{axis=true;}   }
+   if(key=='d' && typing==0){
      if(mode!=0){mode=0; 
       rx=0; rz=0;  
-      timer=0;  rchoose=1; volume=integrate(-10,10);}
+      timer=0;  rchoose=1; //volume=integrate(-10,10);
+    }
    }
-   if(key=='l' && !typing){
-     mode=2;     volume=integrate(-10,10);
+   if(key=='l' && typing==0){
+     mode=2;     
+     //volume=integrate(-10,10);
    }
    if(key=='g'){if(scaleon){scaleon=false;}else{scaleon=true;}}
-   if(key=='s' && !typing){
+   if(key=='s' && typing==0){
      if(mode!=1){mode=1;   
      rx=0; rz=0;  
-      timer=0; rchoose=2; volume=integrate(-10,10);}
+      timer=0; rchoose=2; 
+     //volume=integrate(-10,10);
+     }
    }
    if(key=='r'||key=='R'){
       rx=0; rz=0;  timer2=0; scale2=1;
@@ -243,21 +286,27 @@ void keyPressed(){
       ry+=5*PI/180;
    }
    if(keyCode==ENTER){
-       if(typing){typing=false; 
-       //println("");println("processing "+exp); 
-      rx=0; rz=0; timer2=0; mode=2;  calculate();} 
-       else{typing=true;exp=new String("");
-       //println("");println("--Start typing expression: y=");
-       }
+       if(typing==0){typing++; exp=""; 
+       } 
+       else if(typing==1){
+       exp2=""; typing++;}
+       else if(typing==2){ 
+          typing=0; rx=0; rz=0; timer2=0; mode=2;  calculate();}
    }
-   if(typing){
+   if(typing!=0){
       if(keyCode!=SHIFT && keyCode!=ENTER && keyCode!=BACKSPACE && keyCode!=DELETE){
-      exp=exp+Character.toString(key);
+         if(typing==1){
+                       exp=exp+Character.toString(key);}
+         if(typing==2){exp2=exp2+Character.toString(key);}
       //print(key);
       }
    }
-   if(typing && (keyCode==DELETE||keyCode==BACKSPACE)){
-      exp=exp.substring(0,exp.length()-1);
+   if((keyCode==DELETE||keyCode==BACKSPACE)){
+      if(typing==1){
+      exp=exp.substring(0,exp.length()-1);}
+      if (typing ==2){
+        exp2=exp2.substring(0,exp2.length()-1);
+      }
    }
 }
 void mouseClicked(){
