@@ -23,14 +23,18 @@ int totalP=11;
 double volume=0;
 boolean paused=false;
 boolean cartesian=true;
-//sin@*cos@    s*s*c  c^2 donut         x+sinx      cos(@*1.5) 2.5      sin@*cos1.5@    
+//vase 2+sin(x*3.14/10)
+//String exp="sin@*cos@";    //s*s*c  c^2 donut  5+sinx       x+sinx      cos(@*1.5) 2.5      sin@*cos1.5@    
 //String exp=("1-sin@"); 
 //String exp=("(sin@*(cos@^2^0.25)/(sin@+1.4))-(2*sin@)+2");
 //String exp=("1-2*sin@");
 //String exp=("4.64-(x^2^(1/3))");
 //String exp=("x^2");
+String exp="x^2-30+6*cos(4*x)";
+//String exp="cos(3*x)*2^cos(x)";
 //String exp=("4*cos((10)*cos@)");
-String exp=("x/(1+x^2)");   //volcano.  sinx/(1+x^2)   optional *x
+//String exp="2+4/(cos@^2+0.001)^0.5";
+//String exp=("x/(1+x^2)");   //volcano.  sinx/(1+x^2)   optional *x
 //String exp=("5+sin(8*3.14*@)");
 //String exp=("1-(sin(6*@-6)^2^0.5)+2*(cos(2*@-2))");
 //String exp=("3*sin(@-2)^2+4*cos(2*@-5)");
@@ -39,6 +43,7 @@ String exp=("x/(1+x^2)");   //volcano.  sinx/(1+x^2)   optional *x
 String tempexp="";
 void setup(){
       size(500, 450,P3D);
+      frameRate(70);
       //parse.test();
       calculate();
       //surface.setResizable(true);
